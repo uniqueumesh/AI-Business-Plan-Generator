@@ -10,11 +10,12 @@ from config import GEMINI_API_KEY, GEMINI_MODEL, MAX_RETRIES, REQUEST_TIMEOUT, E
 class GeminiAPIClient:
     """Client for interacting with Google Gemini API"""
     
-    def __init__(self):
-        if not GEMINI_API_KEY:
+    def __init__(self, api_key: Optional[str] = None):
+        key_to_use = api_key or GEMINI_API_KEY
+        if not key_to_use:
             raise ValueError(ERROR_MESSAGES["api_key_missing"])
         
-        genai.configure(api_key=GEMINI_API_KEY)
+        genai.configure(api_key=key_to_use)
         self.model = genai.GenerativeModel(GEMINI_MODEL)
     
     def generate_business_plan(self, form_data: Dict[str, Any]) -> str:

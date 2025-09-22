@@ -34,6 +34,19 @@ def render_header():
 
 def render_sidebar():
     """Render the sidebar with progress indicator"""
+    # API Key input
+    st.sidebar.title("API Settings")
+    api_key = st.sidebar.text_input(
+        "Gemini API Key",
+        value=st.session_state.get('gemini_api_key', ''),
+        type="password",
+        help="Enter your Google Gemini API key (kept only in this session)",
+        placeholder="AIza..."
+    )
+    if api_key != st.session_state.get('gemini_api_key'):
+        st.session_state['gemini_api_key'] = api_key
+    
+    st.sidebar.markdown("---")
     st.sidebar.title("Progress")
     
     steps = [
@@ -79,13 +92,15 @@ def render_company_overview():
         company_name = st.text_input(
             "Company Name *",
             value=st.session_state.form_data.get('company_name', ''),
-            help="Enter your company or business name"
+            help="Enter your company or business name",
+            placeholder="Acme Fitness Co"
         )
         
         target_market = st.text_area(
             "Target Market *",
             value=st.session_state.form_data.get('target_market', ''),
             help="Describe your ideal customers and target audience",
+            placeholder="Professionals aged 25–45 in urban areas seeking convenient home workouts",
             height=100
         )
     
@@ -94,6 +109,7 @@ def render_company_overview():
             "Business/Product Description *",
             value=st.session_state.form_data.get('business_description', ''),
             help="Describe what your business does or what product/service you offer",
+            placeholder="A mobile app offering personalized workout plans and nutrition guidance",
             height=100
         )
         
@@ -101,6 +117,7 @@ def render_company_overview():
             "Mission Statement *",
             value=st.session_state.form_data.get('mission', ''),
             help="What is your company's mission and purpose?",
+            placeholder="Empower busy professionals to stay healthy through simple daily routines",
             height=100
         )
     
@@ -123,6 +140,7 @@ def render_marketing_details():
         "Marketing Strategy *",
         value=st.session_state.form_data.get('marketing_strategy', ''),
         help="Describe your overall marketing approach and strategy",
+        placeholder="Content marketing, influencer partnerships, and targeted social ads",
         height=120
     )
     
@@ -133,6 +151,7 @@ def render_marketing_details():
             "Customer Acquisition Methods",
             value=st.session_state.form_data.get('customer_acquisition', ''),
             help="How will you acquire new customers?",
+            placeholder="Free 7‑day trial, referral program, email onboarding sequence",
             height=100
         )
         
@@ -140,6 +159,7 @@ def render_marketing_details():
             "Marketing Channels",
             value=st.session_state.form_data.get('marketing_channels', ''),
             help="Which channels will you use for marketing?",
+            placeholder="Instagram, YouTube, TikTok, and newsletter collaborations",
             height=100
         )
     
@@ -148,6 +168,7 @@ def render_marketing_details():
             "Budget Considerations",
             value=st.session_state.form_data.get('budget_considerations', ''),
             help="What's your marketing budget and how will you allocate it?",
+            placeholder="$2,000/month for ads, $500/month for content production",
             height=100
         )
     
@@ -170,6 +191,7 @@ def render_competitor_info():
         "Competitor Overview *",
         value=st.session_state.form_data.get('competitor_overview', ''),
         help="Describe your main competitors and the competitive landscape",
+        placeholder="FitApp, HealthPro — both offer generic plans and limited coaching",
         height=120
     )
     
@@ -180,6 +202,7 @@ def render_competitor_info():
             "Competitive Advantages *",
             value=st.session_state.form_data.get('competitive_advantages', ''),
             help="What advantages do you have over competitors?",
+            placeholder="Personalized plans, AI‑driven coaching, progress tracking dashboard",
             height=100
         )
         
@@ -187,6 +210,7 @@ def render_competitor_info():
             "Market Positioning",
             value=st.session_state.form_data.get('market_positioning', ''),
             help="How do you position yourself in the market?",
+            placeholder="Premium yet affordable alternative focusing on accountability",
             height=100
         )
     
@@ -195,6 +219,7 @@ def render_competitor_info():
             "Unique Value Proposition",
             value=st.session_state.form_data.get('unique_value_prop', ''),
             help="What unique value do you provide to customers?",
+            placeholder="Daily micro‑workouts tailored to schedule and equipment",
             height=100
         )
     
@@ -220,6 +245,7 @@ def render_financial_overview():
             "Expected Costs *",
             value=st.session_state.form_data.get('expected_costs', ''),
             help="What are your expected startup and operational costs?",
+            placeholder="Development $8k, hosting $200/mo, marketing $2k/mo",
             height=100
         )
         
@@ -227,6 +253,7 @@ def render_financial_overview():
             "Financial Strategy *",
             value=st.session_state.form_data.get('financial_strategy', ''),
             help="How will you manage your finances and cash flow?",
+            placeholder="Keep CAC:LTV at 1:3, reinvest 30% of profits into growth",
             height=100
         )
     
@@ -235,6 +262,7 @@ def render_financial_overview():
             "Projected Sales *",
             value=st.session_state.form_data.get('projected_sales', ''),
             help="What are your sales projections for the first year?",
+            placeholder="500 subscriptions in year 1 at $15/month",
             height=100
         )
         
@@ -242,6 +270,7 @@ def render_financial_overview():
             "Revenue Model",
             value=st.session_state.form_data.get('revenue_model', ''),
             help="How will you generate revenue?",
+            placeholder="Monthly subscription with annual discount",
             height=100
         )
     
@@ -249,6 +278,7 @@ def render_financial_overview():
         "Funding Requirements",
         value=st.session_state.form_data.get('funding_requirements', ''),
         help="Do you need funding? If so, how much and for what?",
+        placeholder="$50k to cover 6 months runway and marketing tests",
         height=80
     )
     
@@ -290,8 +320,13 @@ def render_generate_section():
 def generate_business_plan():
     """Generate the business plan using AI"""
     try:
+        # Retrieve API key from session
+        api_key = st.session_state.get('gemini_api_key', '')
+        if not api_key:
+            st.error("Please enter your Gemini API key in the sidebar to continue.")
+            return
         # Initialize API client
-        api_client = GeminiAPIClient()
+        api_client = GeminiAPIClient(api_key=api_key)
         
         # Show progress
         progress_bar = st.progress(0)
