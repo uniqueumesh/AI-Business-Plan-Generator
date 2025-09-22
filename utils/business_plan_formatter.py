@@ -4,6 +4,7 @@ Business plan formatting utilities
 from typing import Dict, Any
 import streamlit as st
 from datetime import datetime
+from .pdf_generator import generate_pdf
 
 class BusinessPlanFormatter:
     """Handles formatting and display of generated business plans"""
@@ -84,18 +85,31 @@ class BusinessPlanFormatter:
             formatted_plan: Formatted business plan content
             company_name: Name of the company
         """
-        # Create filename
         safe_company_name = "".join(c for c in company_name if c.isalnum() or c in (' ', '-', '_')).rstrip()
-        filename = f"{safe_company_name}_Business_Plan_{datetime.now().strftime('%Y%m%d')}.md"
-        
-        # Create download button
-        st.download_button(
-            label="📥 Download Business Plan",
-            data=formatted_plan,
-            file_name=filename,
-            mime="text/markdown",
-            help="Download your business plan as a Markdown file"
-        )
+        pdf_filename = f"{safe_company_name}_Business_Plan_{datetime.now().strftime('%Y%m%d')}.pdf"
+
+        # Primary: PDF download
+        try:
+            pdf_bytes = generate_pdf(formatted_plan, company_name)
+            st.download_button(
+                label="📥 Download Business Plan (PDF)",
+                data=pdf_bytes,
+                file_name=pdf_filename,
+                mime="application/pdf",
+                help="Download your business plan as a PDF"
+            )
+        except Exception as e:
+            st.error("Couldn't generate PDF. You can still download Markdown below.")
+            # Fallback: Markdown download
+            md_filename = f"{safe_company_name}_Business_Plan_{datetime.now().strftime('%Y%m%d')}.md"
+            with st.expander("Download as Markdown (fallback)"):
+                st.download_button(
+                    label="📥 Download Business Plan (Markdown)",
+                    data=formatted_plan,
+                    file_name=md_filename,
+                    mime="text/markdown",
+                    help="Download your business plan as a Markdown file"
+                )
     
     def create_summary_card(self, form_data: Dict[str, Any]) -> str:
         """
