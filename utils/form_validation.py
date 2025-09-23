@@ -97,3 +97,4 @@ class FormValidator:
         
         length = len(field_value.strip())
         return min_length <= length <= max_length
+
