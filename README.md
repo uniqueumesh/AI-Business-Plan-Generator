@@ -1,204 +1,121 @@
 # AI Business Plan Generator
 
-An intelligent business plan generator powered by Google's Gemini AI that helps entrepreneurs and business owners create comprehensive, professional business plans through a simple, step-by-step interface.
+Create a complete, investor‑ready business plan in minutes. This Streamlit app uses Google Gemini (2.5 Flash) to turn your inputs into a professional plan you can review online and download as a PDF.
 
 ## 🚀 Features
+- **Guided, 5‑step flow**: Company Overview → Marketing → Competitors → Financials → Generate
+- **Built for non‑technical users**: Clear labels, examples in every field, helpful validation
+- **Gemini API key input (BYOK)**: Enter your key securely in the sidebar (session‑only)
+- **AI‑generated plan**: Structured, comprehensive output using proven plan sections
+- **PDF download**: One‑click export to a clean, readable PDF (Markdown fallback on error)
+- **Fast and private**: No server storage; data stays in your session
 
-- **Step-by-Step Form**: Easy-to-use multi-step form interface
-- **AI-Powered Generation**: Uses Google Gemini 2.5 Flash for intelligent business plan creation
-- **Comprehensive Sections**: Covers all essential business plan components
-- **User-Friendly Design**: Built for non-technical users
-- **Download Functionality**: Export your business plan as a Markdown file
-- **Real-time Validation**: Form validation with helpful error messages
+## 📋 Sections Collected
+1. Company name, description, mission, target market
+2. Marketing strategy, acquisition methods, channels, budget notes
+3. Competitor overview, advantages, positioning, unique value
+4. Expected costs, financial strategy, projected sales, revenue model, funding needs
 
-## 📋 Business Plan Sections
-
-1. **Company Overview**: Company name, business description, mission, and target market
-2. **Marketing Details**: Marketing strategy, customer acquisition, and channels
-3. **Competitor Information**: Competitive analysis and unique value proposition
-4. **Financial Overview**: Costs, financial strategy, and sales projections
-5. **AI Generation**: Automated business plan creation with professional formatting
-
-## 🛠️ Installation
-
+## 🛠️ Setup (Local)
 ### Prerequisites
+- Python 3.9+
+- A Google Gemini API key (get one at Google AI Studio: https://makersuite.google.com/app/apikey)
 
-- Python 3.8 or higher
-- Google Gemini API key (get one at [Google AI Studio](https://makersuite.google.com/app/apikey))
+### Install
+```bash
+git clone https://github.com/yourusername/AI-Business-Plan-Generator.git
+cd AI-Business-Plan-Generator
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# macOS/Linux
+# source venv/bin/activate
+pip install -r requirements.txt
+```
 
-### Setup
+### Run
+```bash
+streamlit run app.py
+```
+Open http://localhost:8501.
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/AI-Business-Plan-Generator.git
-   cd AI-Business-Plan-Generator
-   ```
-
-2. **Create a virtual environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Set up environment variables**
-   ```bash
-   # Copy the example environment file
-   cp env_example.txt .env
-   
-   # Edit .env and add your Gemini API key
-   GEMINI_API_KEY=your_actual_api_key_here
-   ```
-
-5. **Run the application**
-   ```bash
-   streamlit run app.py
-   ```
-
-6. **Open your browser**
-   Navigate to `http://localhost:8501` to use the application.
+### Enter your API key
+- In the app sidebar, paste your Gemini API key (kept only for this session).
 
 ## 🔧 Configuration
-
-### Environment Variables
-
-Create a `.env` file in the project root with the following variables:
-
+You can optionally create a `.env` file for local defaults (the app still supports runtime key via sidebar):
 ```env
-# Required
 GEMINI_API_KEY=your_gemini_api_key_here
-
-# Optional
 MAX_RETRIES=3
 REQUEST_TIMEOUT=60
 ```
+Example template: `env_example.txt`.
 
-### API Key Setup
+## 📦 Dependencies
+Ensure these are present in `requirements.txt` (used by Streamlit Cloud to build the app):
+```txt
+streamlit>=1.28.0
+google-generativeai>=0.3.0
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+requests>=2.31.0
+reportlab>=4.0.0
+```
+- `reportlab` is required for PDF generation. Missing it will cause import errors during deploy.
 
-1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Sign in with your Google account
-3. Create a new API key
-4. Copy the key and add it to your `.env` file
+## 🖥️ Deployment (Streamlit Community Cloud)
+1. Push this repo to GitHub
+2. Create a new Streamlit app from the repo and select `app.py`
+3. Ensure `requirements.txt` contains all dependencies (including `reportlab`)
+4. Configure secrets if desired (optional, since the app accepts the key in the UI)
+5. Deploy. The app should build and run without OS‑level binaries
 
-## 📖 Usage
+## 🧑‍💻 Usage
+1. Complete each step using the examples as guidance
+2. Enter your Gemini API key in the sidebar
+3. Click “Generate Business Plan”
+4. Review the output
+5. Click “Download Business Plan (PDF)” to export
 
-### Step 1: Company Overview
-- Enter your company name
-- Describe your business or product
-- Write your mission statement
-- Define your target market
-
-### Step 2: Marketing Details
-- Outline your marketing strategy
-- Describe customer acquisition methods
-- List marketing channels
-- Add budget considerations
-
-### Step 3: Competitor Information
-- Analyze your competitors
-- Highlight competitive advantages
-- Define market positioning
-- Explain your unique value proposition
-
-### Step 4: Financial Overview
-- Estimate expected costs
-- Describe your financial strategy
-- Project sales for the first year
-- Outline your revenue model
-- Add funding requirements if needed
-
-### Step 5: Generate Plan
-- Review your information
-- Click "Generate Business Plan"
-- Download your professional business plan
-
-## 🏗️ Project Structure
-
+## 🧱 Project Structure
 ```
 AI-Business-Plan-Generator/
-├── app.py                      # Main Streamlit application
-├── config.py                   # Configuration settings
-├── requirements.txt            # Python dependencies
-├── env_example.txt            # Environment variables template
+├── app.py                         # Streamlit app (UI flow, validation, generation)
+├── config.py                      # App and prompt configuration
+├── requirements.txt               # Python dependencies (used by deploy)
+├── env_example.txt                # Optional .env template
 ├── utils/
 │   ├── __init__.py
-│   ├── api_client.py          # Gemini API client
-│   ├── form_validation.py     # Form validation logic
-│   └── business_plan_formatter.py # Output formatting
-├── README.md                  # This file
-└── DEVELOPMENT_PLAN.md        # Development planning document
+│   ├── api_client.py              # Gemini client with runtime key support
+│   ├── form_validation.py         # Required field checks and messages
+│   ├── business_plan_formatter.py # On-screen render + download buttons
+│   └── pdf_generator.py           # ReportLab PDF generation
+└── README.md
 ```
 
-## 🔧 Technical Details
+## ⚙️ Technical Notes
+- **Model**: `gemini-2.0-flash-exp` (configured in `config.py`)
+- **Runtime key**: Read from sidebar; `.env` optional
+- **Retries**: Exponential backoff on generation
+- **PDF**: Generated with ReportLab (no external binaries required)
+- **Security**: No DB; content lives in the user session. Do not paste secrets into form fields
 
-### Dependencies
+## 🧪 Testing Guide
+- Try minimal and long inputs; confirm validation and clean PDF output
+- Generate with a valid key; ensure output sections are structured and readable
+- Verify PDF download on Windows/macOS/iOS/Android
+- Test in Chrome, Edge, Safari, Firefox; confirm mobile responsiveness
 
-- **Streamlit**: Web application framework
-- **Google Generative AI**: Gemini API client
-- **Python-dotenv**: Environment variable management
-- **Pydantic**: Data validation
-
-### API Configuration
-
-- **Model**: Gemini 2.0 Flash Experimental
-- **Temperature**: 0.7 (balanced creativity)
-- **Max Tokens**: 4000
-- **Retry Logic**: 3 attempts with exponential backoff
-
-## 🚨 Troubleshooting
-
-### Common Issues
-
-1. **API Key Error**
-   - Ensure your `GEMINI_API_KEY` is correctly set in the `.env` file
-   - Verify the API key is valid and has proper permissions
-
-2. **Import Errors**
-   - Make sure all dependencies are installed: `pip install -r requirements.txt`
-   - Check that you're using the correct Python version
-
-3. **Form Validation Errors**
-   - Complete all required fields marked with asterisks (*)
-   - Ensure text areas have sufficient content
-
-4. **Generation Errors**
-   - Check your internet connection
-   - Verify API key has sufficient quota
-   - Try reducing the amount of text in form fields
-
-### Getting Help
-
-- Check the [Issues](https://github.com/yourusername/AI-Business-Plan-Generator/issues) page
-- Review the development plan in `DEVELOPMENT_PLAN.md`
-- Ensure all dependencies are properly installed
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+## 🆘 Troubleshooting
+- Import error for `reportlab` during deploy:
+  - Ensure `reportlab` is listed in `requirements.txt` and redeploy
+- Generation fails:
+  - Verify Gemini API key validity/quota; check network
+- UI won’t proceed to next step:
+  - Fill in all required fields marked with “*”
 
 ## 📄 License
+MIT (see `LICENSE`).
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Google Gemini AI for providing the language model
-- Streamlit team for the excellent web framework
-- The open-source community for inspiration and tools
-
-## 📞 Support
-
-For support, email support@yourcompany.com or create an issue in the GitHub repository.
-
----
-
-**Made with ❤️ for entrepreneurs and business owners**
-Generate comprehensive business plan with AI in simple steps.
+## 🙋 Support
+Open an issue on GitHub or contact the site owner.
