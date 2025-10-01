@@ -1,6 +1,6 @@
-streamlit==1.28.1
-google-generativeai==0.3.2
-python-dotenv==1.0.0
-pydantic==2.5.0
-requests==2.31.0
-reportlab==4.0.7
+streamlit
+google-generativeai
+python-dotenv
+pydantic
+requests
+reportlab
