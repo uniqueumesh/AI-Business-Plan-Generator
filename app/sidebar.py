@@ -5,50 +5,50 @@ import streamlit as st
 from utils.form_validation import FormValidator
 
 def render_sidebar():
-    """Render the sidebar with progress indicator"""
-    # API Key input
-    st.sidebar.title("API Settings")
-    api_key = st.sidebar.text_input(
-        "Gemini API Key",
-        value=st.session_state.get('gemini_api_key', ''),
-        type="password",
-        help="Enter your Google Gemini API key (kept only in this session)",
-        placeholder="AIza..."
-    )
-    if api_key != st.session_state.get('gemini_api_key'):
-        st.session_state['gemini_api_key'] = api_key
+    """Render settings and progress in the main area (Alwrity Style)"""
     
-    st.sidebar.markdown("---")
-    st.sidebar.title("Progress")
-    
-    steps = [
-        "Company Overview",
-        "Marketing Details", 
-        "Competitor Information",
-        "Financial Overview",
-        "Generate Plan"
-    ]
-    
-    for i, step in enumerate(steps, 1):
-        if i < st.session_state.current_step:
-            st.sidebar.success(f"✅ {step}")
-        elif i == st.session_state.current_step:
-            st.sidebar.info(f"🔄 {step}")
-        else:
-            st.sidebar.write(f"⏳ {step}")
-    
-    st.sidebar.markdown("---")
-    
-    # Show form data summary
-    if st.session_state.form_data:
-        st.sidebar.subheader("Form Summary")
-        company_name = st.session_state.form_data.get('company_name', 'Not specified')
-        st.sidebar.write(f"**Company:** {company_name}")
+    # 1. API Configuration Expander at the top
+    with st.expander("API Configuration 🔑", expanded=not st.session_state.get('gemini_api_key')):
+        api_key = st.text_input(
+            "Enter your Gemini API Key",
+            value=st.session_state.get('gemini_api_key', ''),
+            type="password",
+            help="Get your key from Google AI Studio",
+            placeholder="AIza..."
+        )
+        if api_key != st.session_state.get('gemini_api_key'):
+            st.session_state['gemini_api_key'] = api_key
+            st.rerun()
+
+    # 2. Progress Steps (Alwrity Style)
+    with st.expander("PRO-TIP - Follow the steps below for best results. 💡", expanded=True):
+        steps = [
+            ("Company Overview", "🏢"),
+            ("Marketing Details", "📢"),
+            ("Competitor Info", "⚔️"),
+            ("Financial Overview", "💰"),
+            ("Generate Plan", "🚀")
+        ]
         
-        # Show completion status
-        validator = FormValidator()
-        is_valid, errors = validator.validate_all_sections(st.session_state.form_data)
-        if is_valid:
-            st.sidebar.success("✅ All sections complete")
-        else:
-            st.sidebar.warning(f"⚠️ {len(errors)} sections need attention")
+        # Display progress as a horizontal row of status cards
+        cols = st.columns(len(steps))
+        for i, ((name, icon), col) in enumerate(zip(steps, cols), 1):
+            if i < st.session_state.current_step:
+                col.success(f"✅ {name}")
+            elif i == st.session_state.current_step:
+                col.info(f"{icon} **{name}**")
+            else:
+                col.write(f"⏳ {name}")
+    
+    # 3. Form Summary (if any data is present)
+    if st.session_state.form_data.get('company_name'):
+        with st.expander("Current Plan Summary 📄", expanded=False):
+            st.write(f"**Company:** {st.session_state.form_data.get('company_name')}")
+            validator = FormValidator()
+            is_valid, _ = validator.validate_all_sections(st.session_state.form_data)
+            if is_valid:
+                st.success("All sections ready!")
+            else:
+                st.warning("Some sections still need details.")
+
+    st.markdown("---")

@@ -12,14 +12,14 @@ def render_company_overview():
     
     with col1:
         company_name = st.text_input(
-            "Company Name *",
+            "✍️ Company Name *",
             value=st.session_state.form_data.get('company_name', ''),
             help="Enter your company or business name",
             placeholder="Acme Fitness Co"
         )
         
         target_market = st.text_area(
-            "Target Market *",
+            "🎯 Target Market *",
             value=st.session_state.form_data.get('target_market', ''),
             help="Describe your ideal customers and target audience",
             placeholder="Professionals aged 25–45 in urban areas seeking convenient home workouts",
@@ -28,7 +28,7 @@ def render_company_overview():
     
     with col2:
         business_description = st.text_area(
-            "Business/Product Description *",
+            "📄 Business/Product Description *",
             value=st.session_state.form_data.get('business_description', ''),
             help="Describe what your business does or what product/service you offer",
             placeholder="A mobile app offering personalized workout plans and nutrition guidance",
@@ -36,7 +36,7 @@ def render_company_overview():
         )
         
         mission = st.text_area(
-            "Mission Statement *",
+            "🚀 Mission Statement *",
             value=st.session_state.form_data.get('mission', ''),
             help="What is your company's mission and purpose?",
             placeholder="Empower busy professionals to stay healthy through simple daily routines",
