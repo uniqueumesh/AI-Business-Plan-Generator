@@ -5,6 +5,8 @@ import streamlit as st
 
 def initialize_session_state():
     """Initialize session state variables"""
+    if 'custom_api_key' not in st.session_state:
+        st.session_state.custom_api_key = ""
     if 'form_data' not in st.session_state:
         st.session_state.form_data = {}
     if 'current_step' not in st.session_state:

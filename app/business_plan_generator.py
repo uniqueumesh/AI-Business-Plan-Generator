@@ -10,10 +10,12 @@ from config import ERROR_MESSAGES
 def generate_business_plan():
     """Generate the business plan using AI"""
     try:
-        # Retrieve API key from session
-        api_key = st.session_state.get('gemini_api_key', '')
+        # Check for API key: Custom (session) takes priority, then Backend (config)
+        from config import GEMINI_API_KEY
+        api_key = st.session_state.get('custom_api_key') or GEMINI_API_KEY
+        
         if not api_key:
-            st.error("Please enter your Gemini API key in the sidebar to continue.")
+            st.error("No API key found. Please provide a Gemini API key in the 'API Configuration' section.")
             return
         # Initialize API client
         api_client = GeminiAPIClient(api_key=api_key)

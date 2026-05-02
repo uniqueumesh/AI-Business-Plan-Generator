@@ -8,16 +8,33 @@ def render_sidebar():
     """Render settings and progress in the main area (Alwrity Style)"""
     
     # 1. API Configuration Expander at the top
-    with st.expander("API Configuration 🔑", expanded=not st.session_state.get('gemini_api_key')):
-        api_key = st.text_input(
-            "Enter your Gemini API Key",
-            value=st.session_state.get('gemini_api_key', ''),
+    from config import GEMINI_API_KEY
+    
+    # We use the backend key if available, but don't show it in the input box
+    has_backend_key = bool(GEMINI_API_KEY)
+    has_custom_key = bool(st.session_state.get('custom_api_key'))
+    
+    expander_label = "API Configuration 🔑"
+    if not (has_backend_key or has_custom_key):
+        expander_label += " (Action Required)"
+
+    with st.expander(expander_label, expanded=not (has_backend_key or has_custom_key)):
+        if has_backend_key and not has_custom_key:
+            st.success("✅ A default API key is active. You can provide your own below to override it.")
+        elif has_custom_key:
+            st.info("💡 Using your custom API key.")
+        else:
+            st.warning("⚠️ No API key found. Please enter your own to continue.")
+
+        custom_key = st.text_input(
+            "Custom Gemini API Key",
+            value=st.session_state.get('custom_api_key', ''),
             type="password",
-            help="Get your key from Google AI Studio",
+            help="Your key is only kept for this session and will disappear when you close the tool.",
             placeholder="AIza..."
         )
-        if api_key != st.session_state.get('gemini_api_key'):
-            st.session_state['gemini_api_key'] = api_key
+        if custom_key != st.session_state.get('custom_api_key'):
+            st.session_state['custom_api_key'] = custom_key
             st.rerun()
 
     # 2. Progress Steps (Alwrity Style)
