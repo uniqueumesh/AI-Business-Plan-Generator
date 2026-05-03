@@ -5,57 +5,59 @@ import google.generativeai as genai
 from typing import Dict, Any, Optional
 import time
 import streamlit as st
-from config import GEMINI_API_KEY, GEMINI_MODEL, MAX_RETRIES, REQUEST_TIMEOUT, ERROR_MESSAGES
+from config import GEMINI_API_KEY, GEMINI_MODELS, MAX_RETRIES_PER_MODEL, REQUEST_TIMEOUT, ERROR_MESSAGES
 
 class GeminiAPIClient:
-    """Client for interacting with Google Gemini API"""
+    """Client for interacting with Google Gemini API with fallback logic"""
     
     def __init__(self, api_key: Optional[str] = None):
-        key_to_use = api_key or GEMINI_API_KEY
-        if not key_to_use:
+        self.api_key = api_key or GEMINI_API_KEY
+        if not self.api_key:
             raise ValueError(ERROR_MESSAGES["api_key_missing"])
         
-        genai.configure(api_key=key_to_use)
-        self.model = genai.GenerativeModel(GEMINI_MODEL)
-    
-    def generate_business_plan(self, form_data: Dict[str, Any]) -> str:
+        genai.configure(api_key=self.api_key)
+        self.models = GEMINI_MODELS
+
+    def generate_business_plan(self, form_data: Dict[str, Any]) -> Optional[str]:
         """
-        Generate a business plan using the provided form data
+        Generate a business plan using cascading fallback logic
+        """
+        prompt = self._prepare_prompt(form_data)
         
-        Args:
-            form_data: Dictionary containing all form inputs
-            
-        Returns:
-            Generated business plan as string
-        """
-        try:
-            # Prepare the prompt with form data
-            prompt = self._prepare_prompt(form_data)
-            
-            # Generate content with retry logic
-            for attempt in range(MAX_RETRIES):
-                try:
-                    response = self.model.generate_content(
-                        prompt,
-                        generation_config=genai.types.GenerationConfig(
-                            temperature=0.7,
-                            max_output_tokens=4000,
+        for model_name in self.models:
+            try:
+                # Update UI via session state or let the caller handle it
+                # For now, we attempt each model in the tier
+                model = genai.GenerativeModel(model_name)
+                
+                for attempt in range(MAX_RETRIES_PER_MODEL):
+                    try:
+                        response = model.generate_content(
+                            prompt,
+                            generation_config=genai.types.GenerationConfig(
+                                temperature=0.7,
+                                max_output_tokens=4000,
+                            )
                         )
-                    )
-                    
-                    if response.text:
-                        return response.text
-                    else:
-                        raise Exception("Empty response from API")
                         
-                except Exception as e:
-                    if attempt == MAX_RETRIES - 1:
-                        raise e
-                    time.sleep(2 ** attempt)  # Exponential backoff
-            
-        except Exception as e:
-            st.error(f"{ERROR_MESSAGES['api_error']}: {str(e)}")
-            return None
+                        if response and response.text:
+                            return response.text
+                        else:
+                            raise Exception("Empty response from API")
+                            
+                    except Exception as e:
+                        if "429" in str(e) or "quota" in str(e).lower():
+                            # Quota exceeded, break inner loop to try next model
+                            break
+                        if attempt == MAX_RETRIES_PER_MODEL - 1:
+                            raise e
+                        time.sleep(2 ** attempt)
+                        
+            except Exception as e:
+                # Log error and continue to next model in tier
+                continue
+                
+        return None
     
     def _prepare_prompt(self, form_data: Dict[str, Any]) -> str:
         """Prepare the prompt with form data"""
