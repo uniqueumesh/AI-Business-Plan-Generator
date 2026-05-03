@@ -9,8 +9,13 @@ load_dotenv()
 
 # API Configuration
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = "gemini-2.5-flash"
-MAX_RETRIES = 3
+# Tiered model list for fallback logic
+GEMINI_MODELS = [
+    "gemini-2.5-flash-lite",  # Primary: Fast, high quota
+    "gemini-2.5-flash",                     # Secondary: Balanced
+    "gemini-2.5-pro"             # Tertiary: High capability
+]
+MAX_RETRIES_PER_MODEL = 2
 REQUEST_TIMEOUT = 60
 
 # Application Configuration
